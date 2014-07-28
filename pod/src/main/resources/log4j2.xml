@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <RollingFile name="track" fileName="log/track-now" filePattern="log/track-%i">
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="20 MB" />
+            </Policies>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %c %X %x %m%n" />
+        </RollingFile>
+        <Console name="critical">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %c %X %x %m%n" />
+        </Console>
+        <File name="assertion" fileName="log/assertion-evaluation">
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss,SSS}] [postcondition] %X %x %m%n" />
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="ALL">
+            <AppenderRef ref="track" />
+            <AppenderRef ref="critical">
+                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY" />
+            </AppenderRef>
+            <AppenderRef ref="assertion">
+                <MarkerFilter marker="Assertion" onMatch="ACCEPT" onMismatch="DENY" />
+            </AppenderRef>
+        </Root>
+    </Loggers>
+</Configuration>

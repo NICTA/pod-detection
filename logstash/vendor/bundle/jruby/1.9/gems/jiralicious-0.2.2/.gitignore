@@ -1,0 +1,12 @@
+*.gem
+.bundle
+Gemfile.lock
+pkg/*
+*.swp
+*.swo
+TAGS
+vendor/bundle
+*~
+\#*#
+*.#*
+/bin

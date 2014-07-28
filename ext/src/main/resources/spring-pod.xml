@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean name="detectionServiceContext" class="au.com.nicta.ssrg.pod.DetectionServiceContext">
+        <property name="port" value="8000" />
+        <property name="processes">
+            <list>
+                <bean class="au.com.nicta.ssrg.pod.Process">
+                    <property name="name" value="AsgardAutoRolloutLowLevelMonitor" />
+                    <property name="type" value="Snapshot" />
+                    <property name="urlStepMap">
+                        <map>
+                            <entry key="/rollingupgrade/{asgName}/{amiID}/step5">
+                                <bean class="au.com.nicta.ssrg.pod.Step">
+                                    <property name="name" value="step5" />
+                                    <property name="assertionKeys">
+                                        <list>
+                                            <value>oldElbInstanceRemovedAndDeregisteredAssertion</value>
+                                        </list>
+                                    </property>
+                                </bean>
+                            </entry>
+                            <entry key="/rollingupgrade/{asgName}/{amiID}/step6">
+                                <bean class="au.com.nicta.ssrg.pod.Step">
+                                    <property name="name" value="step6" />
+                                    <property name="assertionKeys">
+                                        <list>
+                                            <value>oldInstanceTerminatedAssertion</value>
+                                        </list>
+                                    </property>
+                                </bean>
+                            </entry>
+                            <entry key="/rollingupgrade/{asgName}/{amiID}/step7">
+                                <bean class="au.com.nicta.ssrg.pod.Step">
+                                    <property name="name" value="step7" />
+                                    <property name="assertionKeys">
+                                        <list>
+                                            <value>newInstanceStartedAssertion</value>
+                                        </list>
+                                    </property>
+                                </bean>
+                            </entry>
+                            <entry key="/rollingupgrade/{asgName}/{amiID}/step8">
+                                <bean class="au.com.nicta.ssrg.pod.Step">
+                                    <property name="name" value="step8" />
+                                    <property name="assertionKeys">
+                                        <list>
+                                            <value>newElbInstanceReadyAndRegisteredAssertion</value>
+                                        </list>
+                                    </property>
+                                </bean>
+                            </entry>
+                        </map>
+                    </property>
+                </bean>
+                <bean class="au.com.nicta.ssrg.pod.Process">
+                    <property name="name" value="AsgardAutoRolloutHighLevelMonitor" />
+                    <property name="type" value="Snapshot" />
+                    <property name="urlStepMap">
+                        <map>
+                            <entry key="/rollingupgrade/{asgName}/{amiID}/{step}/high">
+                                <bean class="au.com.nicta.ssrg.pod.Step">
+                                    <property name="name" value="step7" />
+                                    <property name="assertionKeys">
+                                        <list>
+                                            <value>asgInstanceNumAssertion</value>
+                                            <value>asgInstanceNumWithLaunchConfigAssertion</value>
+                                        </list>
+                                    </property>
+                                </bean>
+                            </entry>
+                        </map>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <bean name="oldElbInstanceRemovedAndDeregisteredAssertion" class="au.com.nicta.ssrg.pod.assertion.ElbInstanceExistenceAssertion" scope="prototype">
+        <property name="timeout" value="30000" />
+        <property name="maxRepetition" value="5" />
+        <property name="delay" value="10000" />
+        <property name="shouldInstanceExist" value="false" />
+        <property name="elbName" value="" />
+    </bean>
+    <bean name="oldInstanceTerminatedAssertion" class="au.com.nicta.ssrg.pod.assertion.InstanceStateAssertion" scope="prototype">
+        <property name="timeout" value="50000" />
+        <property name="maxRepetition" value="5" />
+        <property name="delay" value="10000" />
+        <property name="stateText" value="terminated" />
+    </bean>
+    <bean name="newInstanceStartedAssertion" class="au.com.nicta.ssrg.pod.assertion.InstanceStateAssertion" scope="prototype">
+        <property name="timeout" value="50000" />
+        <property name="maxRepetition" value="5" />
+        <property name="delay" value="10000" />
+        <property name="stateText" value="running" />
+    </bean>
+    <bean name="newElbInstanceReadyAndRegisteredAssertion" class="au.com.nicta.ssrg.pod.assertion.ElbInstanceExistenceAssertion" scope="prototype">
+        <property name="timeout" value="30000" />
+        <property name="maxRepetition" value="5" />
+        <property name="delay" value="10000" />
+        <property name="shouldInstanceExist" value="false" />
+        <property name="elbName" value="" />
+    </bean>
+    <bean name="asgInstanceNumAssertion" class="au.com.nicta.ssrg.pod.assertion.AsgInstanceNumAssertion" scope="prototype">
+        <property name="timeout" value="5000" />
+        <property name="maxRepetition" value="5" />
+        <property name="delay" value="5000" />
+        <property name="minInstanceNum" value="2" />
+    </bean>
+    <bean name="asgInstanceNumWithLaunchConfigAssertion" class="au.com.nicta.ssrg.pod.assertion.AsgInstanceNumAssertionWithLaunchConfig" scope="prototype">
+        <property name="timeout" value="5000" />
+        <property name="maxRepetition" value="5" />
+        <property name="delay" value="5000" />
+        <property name="minInstanceNum" value="2" />
+        <property name="launchConfigName" value="linux-micro-apache-lc" />
+    </bean>
+</beans>
