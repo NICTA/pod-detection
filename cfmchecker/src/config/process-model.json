@@ -1,0 +1,121 @@
+{
+    "name": "Asgard Rolling Upgrade Process",
+    "type": "model",
+    "nodes": [
+        {
+            "name": "Start rolling upgrade task",
+            "type": "activity",
+            "id": 1
+        },
+        {
+            "name": "Update launch configuration",
+            "type": "activity",
+            "id": 2
+        },
+        {
+            "name": "Sort instances",
+            "type": "activity",
+            "id": 3
+        },
+        {
+            "name": "Status info",
+            "type": "activity",
+            "id": 4
+        },
+        {
+            "name": "Remove and deregister old instance from ELB",
+            "type": "activity",
+            "id": 5
+        },
+        {
+            "name": "Terminate old instance",
+            "type": "activity",
+            "id": 6
+        },
+        {
+            "name": "Wait for ASG to start new instance",
+            "type": "activity",
+            "id": 7
+        },
+        {
+            "name": "New instance ready and registered with ELB",
+            "type": "activity",
+            "id": 8
+        },
+        {
+            "name": "Rolling upgrade task completed",
+            "type": "activity",
+            "id": 9
+        },
+        {
+            "type": "gateway-xor-split",
+            "id": 10
+        },
+        {
+            "type": "gateway-xor-join",
+            "id": 11
+        },
+        {
+            "type": "event-start",
+            "id": 12
+        },
+        {
+            "type": "event-end",
+            "id": 13
+        }
+    ],
+    "links": [
+        {
+            "source": 12,
+            "target": 1
+        },
+        {
+            "source": 1,
+            "target": 2
+        },
+        {
+            "source": 2,
+            "target": 3
+        },
+        {
+            "source": 3,
+            "target": 4
+        },
+        {
+            "source": 4,
+            "target": 11
+        },
+        {
+            "source": 11,
+            "target": 5
+        },
+        {
+            "source": 5,
+            "target": 6
+        },
+        {
+            "source": 6,
+            "target": 7
+        },
+        {
+            "source": 7,
+            "target": 8
+        },
+        {
+            "source": 8,
+            "target": 10
+        },
+        {
+            "source": 10,
+            "target": 11
+        },
+        {
+            "source": 10,
+            "target": 9
+        },
+        {
+            "source": 9,
+            "target": 13
+        }
+    ]
+}

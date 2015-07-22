@@ -1,0 +1,38 @@
+[
+    {
+        "activityName": "Start rolling upgrade task",
+        "pattern": "Start\\srolling upgrade task"
+    },
+    {
+        "activityName": "Update launch configuration",
+        "pattern": "Update\\slaunch configuration"
+    },
+    {
+        "activityName": "Sort instances",
+        "pattern": "Sort\\sinstances"
+    },
+    {
+        "activityName": "Status info",
+        "pattern": "Status\\sinfo"
+    },
+    {
+        "activityName": "Remove and deregister old instance from ELB",
+        "pattern": "Remove\\sand deregister old instance from ELB"
+    },
+    {
+        "activityName": "Terminate old instance",
+        "pattern": "Terminate\\sold instance"
+    },
+    {
+        "activityName": "Wait for ASG to start new instance",
+        "pattern": "Wait\\sfor ASG to start new instance"
+    },
+    {
+        "activityName": "New instance ready and registered with ELB",
+        "pattern": "New\\sinstance ready and registered with ELB"
+    },
+    {
+        "activityName": "Rolling upgrade task completed",
+        "pattern": "Rolling\\supgrade task completed"
+    }
+]
