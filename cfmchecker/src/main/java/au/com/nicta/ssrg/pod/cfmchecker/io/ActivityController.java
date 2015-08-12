@@ -19,6 +19,7 @@ import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessLogEvent;
 @RequestMapping(value="/activity")
 public class ActivityController {
     @Autowired
+    @SuppressWarnings("unchecked")
     public ActivityController(ApplicationContext context) {
         processEventQueue = (BlockingQueue<ProcessLogEvent>)
             context.getBean("processEventQueue");

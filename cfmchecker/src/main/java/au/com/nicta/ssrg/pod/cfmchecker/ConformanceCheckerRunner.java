@@ -17,6 +17,7 @@ import au.com.nicta.ssrg.pod.cfmchecker.io.ProcessRepository;
 @Component
 public class ConformanceCheckerRunner implements CommandLineRunner {
     @Async
+    @SuppressWarnings("unchecked")
     public void run(String... args) throws IOException, InterruptedException {
         processEventQueue = (BlockingQueue<ProcessLogEvent>)
             context.getBean("processEventQueue");

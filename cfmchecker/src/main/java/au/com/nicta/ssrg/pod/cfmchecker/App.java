@@ -27,7 +27,7 @@ public class App {
 
     @Bean(name="processModelSourceFile")
     public File getProcessModelSourceFile() {
-        return new File("asgard-rolling-upgrade-model.json");
+        return new File("process-model.json");
     }
 
     @Bean(name="processModel")
@@ -45,7 +45,7 @@ public class App {
 
     @Bean(name="activityPatternSourceFile")
     public File getActivityPatternSourceFile() {
-        return new File("asgard-rolling-upgrade-activity-pattern.json");
+        return new File("activity-pattern.json");
     }
 
     @Bean(name="activityPatternImporter")

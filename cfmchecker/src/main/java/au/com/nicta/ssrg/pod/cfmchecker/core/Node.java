@@ -35,12 +35,12 @@ public abstract class Node {
         }
 
         public Date getLastExecutionTime() {
-			return lastExecutionTime;
-		}
+            return lastExecutionTime;
+        }
 
         public Date getLastPullTime() {
-			return lastPullTime;
-		}
+            return lastPullTime;
+        }
 
         public void updateLastExecutionTime() {
             lastExecutionTime = new Date();
@@ -83,8 +83,8 @@ public abstract class Node {
         }
 
         private Date firstExecutionTime;
-		private Date lastExecutionTime;
-		private Date lastPullTime;
+        private Date lastExecutionTime;
+        private Date lastPullTime;
     }
 
     public abstract State newState();

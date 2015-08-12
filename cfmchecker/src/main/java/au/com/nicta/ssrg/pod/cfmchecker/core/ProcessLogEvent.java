@@ -75,7 +75,9 @@ public class ProcessLogEvent {
     }
 
     public void addTag(ProcessEventTag tag) {
-        tags.add(tag);
+        if (tag != null) {
+            tags.add(tag);
+        }
     }
 
     public boolean containsTag(ProcessEventTag tag) {

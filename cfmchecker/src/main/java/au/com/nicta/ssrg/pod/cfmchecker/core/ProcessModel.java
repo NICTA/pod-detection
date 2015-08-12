@@ -117,7 +117,7 @@ public class ProcessModel extends Node {
         return new State();
     }
 
-	@JsonCreator
+    @JsonCreator
     public ProcessModel(
             @JsonProperty("name") String name,
             @JsonProperty("nodes") Collection<Node> nodes,
@@ -226,11 +226,11 @@ public class ProcessModel extends Node {
 
     @Override
     public boolean pull(
-	        Link.State pullLinkState,
+            Link.State pullLinkState,
             Node.State nodeState,
-	        List<Link.State> linkStatesIn,
-	        List<Link.State> linkStatesOut,
-	        ProcessContext context) {
+            List<Link.State> linkStatesIn,
+            List<Link.State> linkStatesOut,
+            ProcessContext context) {
         ProcessModel.State modelState = (ProcessModel.State)nodeState;
         if (!modelState.checkInvariants()) {
             ConformanceException ex =
@@ -241,25 +241,25 @@ public class ProcessModel extends Node {
         if (modelState.releaseToken()) {
             pullLinkState.produce();
         }
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public boolean execute(
+    @Override
+    public boolean execute(
             Node.State nodeState,
-	        List<Link.State> linkStatesIn,
-	        List<Link.State> linkStatesOut,
-			ProcessContext context) {
-		Link.State linkStateIn = linkStatesIn.get(0);
-		boolean isSuccess = linkStateIn.hasRemaining();
-		if (!isSuccess) {
-			context.pull(linkStateIn.getLink());
-			isSuccess = linkStateIn.hasRemaining();
-		}
-		linkStatesIn.get(0).consume();
+            List<Link.State> linkStatesIn,
+            List<Link.State> linkStatesOut,
+            ProcessContext context) {
+        Link.State linkStateIn = linkStatesIn.get(0);
+        boolean isSuccess = linkStateIn.hasRemaining();
+        if (!isSuccess) {
+            context.pull(linkStateIn.getLink());
+            isSuccess = linkStateIn.hasRemaining();
+        }
+        linkStatesIn.get(0).consume();
         ((ProcessModel.State)nodeState).keepToken();
-		return isSuccess;
-	}
+        return isSuccess;
+    }
 
     @Override
     public String toString() {

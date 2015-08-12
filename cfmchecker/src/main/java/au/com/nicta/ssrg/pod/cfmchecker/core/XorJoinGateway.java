@@ -17,7 +17,31 @@ public class XorJoinGateway extends Gateway {
 
     @Override
     public boolean execute(
-	        Node.State nodeState,
+            Node.State nodeState,
+            List<Link.State> linkStatesIn,
+            List<Link.State> linkStatesOut,
+            ProcessContext context) {
+        return false;
+    }
+
+    @Override
+    public boolean pull(
+            Link.State pullLinkState,
+            Node.State nodeState,
+            List<Link.State> linkStatesIn,
+            List<Link.State> linkStatesOut,
+            ProcessContext context) {
+        if (!move(nodeState, linkStatesIn, linkStatesOut, context)) {
+            for (Link.State linkStateIn : linkStatesIn) {
+                context.pull(linkStateIn.getLink());
+            }
+            return move(nodeState, linkStatesIn, linkStatesOut, context);
+        }
+        return true;
+    }
+
+    private boolean move(
+            Node.State nodeState,
             List<Link.State> linkStatesIn,
             List<Link.State> linkStatesOut,
             ProcessContext context) {
@@ -30,21 +54,5 @@ public class XorJoinGateway extends Gateway {
             }
         }
         return isSuccess;
-    }
-
-    @Override
-    public boolean pull(
-            Link.State pullLinkState,
-	        Node.State nodeState,
-            List<Link.State> linkStatesIn,
-            List<Link.State> linkStatesOut,
-            ProcessContext context) {
-        if (!execute(nodeState, linkStatesIn, linkStatesOut, context)) {
-            for (Link.State linkStateIn : linkStatesIn) {
-                context.pull(linkStateIn.getLink());
-            }
-            return execute(nodeState, linkStatesIn, linkStatesOut, context);
-        }
-        return true;
     }
 }

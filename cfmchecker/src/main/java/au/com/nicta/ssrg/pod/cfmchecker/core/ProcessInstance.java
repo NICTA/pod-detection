@@ -134,28 +134,26 @@ public class ProcessInstance implements ProcessContext {
         return writer.toString();
     }
 
-    private Node updateActiveNode(Node node, Node.State nodeState) {
-        if (node instanceof Activity || node instanceof ProcessModel) {
-
-            Node lastActiveNode = activeNode;
-            activeNode = node;
-
-            if (activeNode instanceof Activity) {
-                ((Activity.State)nodeState).start();
-            }
-
-            if (lastActiveNode instanceof Activity) {
-                try {
-                    ((Activity.State)nodeStateMap.get(lastActiveNode)).end();
-                } catch (ConformanceException ex) {
-                    ex.nodeState(nodeState);
-                    throw ex;
-                }
-            }
-
-            return lastActiveNode;
+    private void updateActiveNode(Node node, Node.State nodeState) {
+        if (!(node instanceof Activity) && !(node instanceof ProcessModel)) {
+            return;
         }
-        return null;
+
+        Node lastActiveNode = activeNode;
+        activeNode = node;
+
+        if (activeNode instanceof Activity) {
+            ((Activity.State)nodeState).start();
+        }
+
+        if (lastActiveNode instanceof Activity) {
+            try {
+                ((Activity.State)nodeStateMap.get(lastActiveNode)).end();
+            } catch (ConformanceException ex) {
+                ex.nodeState(nodeState);
+                throw ex;
+            }
+        }
     }
 
     private List<Link.State> getLinkStates(Collection<Link> links) {

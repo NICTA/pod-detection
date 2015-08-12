@@ -17,19 +17,19 @@ public class EndEvent extends Event {
 
     @Override
     public boolean execute(
-	        Node.State nodeState,
+            Node.State nodeState,
             List<Link.State> linkStatesIn,
             List<Link.State> linkStatesOut,
             ProcessContext context) {
-		boolean isSuccess = linkStatesIn.get(0).hasRemaining();
-		linkStatesIn.get(0).consume();
-		return isSuccess;
+        boolean isSuccess = linkStatesIn.get(0).hasRemaining();
+        linkStatesIn.get(0).consume();
+        return isSuccess;
     }
 
     @Override
     public boolean pull(
             Link.State pullLinkState,
-	        Node.State nodeState,
+            Node.State nodeState,
             List<Link.State> linkStatesIn,
             List<Link.State> linkStatesOut,
             ProcessContext context) {

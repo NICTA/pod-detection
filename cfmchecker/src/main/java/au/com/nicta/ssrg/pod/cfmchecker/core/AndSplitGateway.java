@@ -2,11 +2,11 @@ package au.com.nicta.ssrg.pod.cfmchecker.core;
 
 import java.util.List;
 
-public class XorSplitGateway extends Gateway {
+public class AndSplitGateway extends Gateway {
     public class State extends Node.State {
         @Override
-        public XorSplitGateway getNode() {
-            return XorSplitGateway.this;
+        public AndSplitGateway getNode() {
+            return AndSplitGateway.this;
         }
     }
 
@@ -34,12 +34,14 @@ public class XorSplitGateway extends Gateway {
         Link.State linkStateIn = linkStatesIn.get(0);
         if (!linkStateIn.hasRemaining()) {
             context.pull(linkStateIn.getLink());
+            if (!linkStateIn.hasRemaining()) {
+                return false;
+            }
         }
-        if (linkStateIn.hasRemaining()) {
-            linkStateIn.consume();
-            pullLinkState.produce();
-            return true;
+        linkStateIn.consume();
+        for (Link.State linkStateOut : linkStatesOut) {
+            linkStateOut.produce();
         }
-        return false;
+        return true;
     }
 }
