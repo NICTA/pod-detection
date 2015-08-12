@@ -39,24 +39,25 @@ public class ProcessEsRepository
     public void storeLogEvent(ProcessLogEvent event) {
         try {
             String source = convertEventToJson(event);
-            Client esClient = getEsClient();
-            IndexResponse response = esClient.
-                prepareIndex(esIndex, logEventEsType).
-                setSource(source).
-                execute().
-                actionGet();
-            if (response.isCreated()) {
-                System.out.printf(
-                    "Successfully stored log event. event=%s%n",
-                    source);
-            } else {
-                StringWriter writer = new StringWriter();
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.writeValue(writer, response.getHeaders());
-                System.out.printf(
-                    "Failed to store log event. event=%s, headers=%s",
-                    source,
-                    writer.toString());
+            try(Client esClient = getEsClient()) {
+                IndexResponse response = esClient.
+                    prepareIndex(esIndex, logEventEsType).
+                    setSource(source).
+                    execute().
+                    actionGet();
+                if (response.isCreated()) {
+                    System.out.printf(
+                        "Successfully stored log event. event=%s%n",
+                        source);
+                } else {
+                    StringWriter writer = new StringWriter();
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.writeValue(writer, response.getHeaders());
+                    System.out.printf(
+                        "Failed to store log event. event=%s, headers=%s",
+                        source,
+                        writer.toString());
+                }
             }
         } catch (IOException ex) {
             ex.printStackTrace();
