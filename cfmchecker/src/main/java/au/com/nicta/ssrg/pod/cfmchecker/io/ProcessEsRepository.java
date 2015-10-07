@@ -6,11 +6,10 @@ import java.util.List;
 
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-
 import org.springframework.stereotype.Component;
 
 import au.com.nicta.ssrg.pod.cfmchecker.core.Activity;
@@ -39,7 +38,7 @@ public class ProcessEsRepository
     public void storeLogEvent(ProcessLogEvent event) {
         try {
             String source = convertEventToJson(event);
-            try(Client esClient = getEsClient()) {
+            try (Client esClient = getEsClient()) {
                 IndexResponse response = esClient.
                     prepareIndex(esIndex, logEventEsType).
                     setSource(source).
@@ -65,7 +64,8 @@ public class ProcessEsRepository
     }
 
     private Client getEsClient() {
-        return new TransportClient(esSettings).addTransportAddress(esTransportAddresss);
+        return new TransportClient(esSettings).
+            addTransportAddress(esTransportAddresss);
     }
 
     private String esIndex;

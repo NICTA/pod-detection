@@ -7,6 +7,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.apache.commons.lang3.tuple.MutablePair;
+
 import au.com.nicta.ssrg.pod.cfmchecker.core.ConformanceException.ErrorCode;
 
 public class Activity extends Node {
@@ -61,90 +63,92 @@ public class Activity extends Node {
     public class State extends Node.State {
         @Override
         public Activity getNode() {
-            return Activity.this;
-        }
+			return Activity.this;
+		}
 
-        public void start() {
-            startTimes.add(new Date());
-            endTimes.add(null);
-        }
+		public void start() {
+			activeIntervals.add(new MutablePair<Date, Date>(new Date(), null));
+		}
 
-        public void end() {
-            int index = endTimes.size() - 1;
+		public void end() {
+			if (activeIntervals.size() == 0) {
+				return;
+			}
 
-            if (index < 0) {
-                return;
-            }
+			MutablePair<Date, Date> lastActiveInterval =
+				activeIntervals.get(activeIntervals.size() - 1);
+			lastActiveInterval.setRight(new Date());
 
-            endTimes.remove(index);
-            endTimes.add(new Date());
+			long span =
+				lastActiveInterval.getRight().getTime() -
+				lastActiveInterval.getLeft().getTime();
+			System.out.printf(
+				"Activity (id=%d, name=%s) executed for %d ms.%n",
+				Activity.this.getID(),
+				Activity.this.getName(),
+				span);
+			boolean isValid = Activity.this.timeChecker.checkSpan(
+				Activity.this.getName(), span);
+			if (!isValid) {
+				incrementErrorCount();
+				throw new ConformanceException(ErrorCode.TIME_ANOMALY);
+			}
+		}
 
-            long span =
-                endTimes.get(index).getTime() - startTimes.get(index).getTime();
-            System.out.printf(
-                "Activity (id=%d, name=%s) executed for %d ms.%n",
-                Activity.this.getID(),
-                Activity.this.getName(),
-                span);
-            boolean isValid = Activity.this.timeChecker.checkSpan(
-                Activity.this.getName(), span);
-            if (!isValid) {
-                throw new ConformanceException(ErrorCode.TIME_ANOMALY);
-            }
-        }
+		private List<MutablePair<Date, Date>> activeIntervals = new ArrayList<>();
+	}
 
-        private List<Date> startTimes = new ArrayList<>();
-        private List<Date> endTimes = new ArrayList<>();
-    }
+	@JsonCreator
+	public Activity(
+			@JsonProperty("name") String name,
+			@JsonProperty("tc") TimeChecker timeChecker) {
+		this.name = name;
+		if (timeChecker != null) {
+			this.timeChecker = timeChecker;
+		} else {
+			this.timeChecker = new TimeChecker(null);
+		}
+	}
 
-    @JsonCreator
-    public Activity(
-            @JsonProperty("name") String name,
-            @JsonProperty("tc") TimeChecker timeChecker) {
-        this.name = name;
-        if (timeChecker != null) {
-            this.timeChecker = timeChecker;
-        } else {
-            this.timeChecker = new TimeChecker(null);
-        }
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getName() {
-        return name;
-    }
+	@Override
+	public State newState() {
+		return new State();
+	}
 
-    @Override
-    public State newState() {
-        return new State();
-    }
-
-    @Override
+	@Override
     public boolean pull(
-            Link.State pullLinkState,
-            Node.State nodeState,
-            List<Link.State> linkStatesIn,
-            List<Link.State> linkStatesOut,
-            ProcessContext context) {
-        return false;
-    }
+	        Link.State pullLinkState,
+	        Node.State nodeState,
+	        List<Link.State> linkStatesIn,
+	        List<Link.State> linkStatesOut,
+	        ProcessContext context) {
+		return false;
+	}
 
-    @Override
-    public boolean execute(
-            Node.State nodeState,
-            List<Link.State> linkStatesIn,
-            List<Link.State> linkStatesOut,
-            ProcessContext context) {
-        Link.State linkStateIn = linkStatesIn.get(0);
-        boolean isSuccess = linkStateIn.hasRemaining();
-        if (!isSuccess) {
-            context.pull(linkStateIn.getLink());
-            isSuccess = linkStateIn.hasRemaining();
-        }
-        linkStatesIn.get(0).consume();
-        linkStatesOut.get(0).produce();
-        return isSuccess;
-    }
+	@Override
+	public boolean execute(
+	        Node.State nodeState,
+	        List<Link.State> linkStatesIn,
+	        List<Link.State> linkStatesOut,
+			ProcessContext context) {
+		Link.State linkStateIn = linkStatesIn.get(0);
+		boolean isSuccess = linkStateIn.hasRemaining();
+		if (!isSuccess) {
+			context.pull(linkStateIn.getLink());
+			isSuccess = linkStateIn.hasRemaining();
+		}
+		linkStatesIn.get(0).consume();
+		linkStatesOut.get(0).produce();
+		if (!isSuccess) {
+			nodeState.incrementErrorCount();
+		}
+		return isSuccess;
+	}
 
-    private String name;
-    private TimeChecker timeChecker;
+	private String name;
+	private TimeChecker timeChecker;
 }

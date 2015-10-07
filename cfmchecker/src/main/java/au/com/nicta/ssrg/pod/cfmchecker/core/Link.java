@@ -9,107 +9,102 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 public class Link {
-    public class State {
-        public State() {
-            produced = 0;
-            consumed = 0;
-            missing = 0;
-        }
 
-        public Link getLink() {
-            return Link.this;
-        }
+	public class State {
+		public State() {
+			produced = 0;
+			consumed = 0;
+			missing = 0;
+		}
 
-        public int getProduced() {
-            return produced;
-        }
+		public Link getLink() {
+			return Link.this;
+		}
 
-        public int getConsumed() {
-            return consumed;
-        }
+		public int getProduced() {
+			return produced;
+		}
 
-        public int getMissing() {
-            return missing;
-        }
+		public int getConsumed() {
+			return consumed;
+		}
 
-        public int getRemaining() {
-            return produced + missing - consumed;
-        }
+		public int getMissing() {
+			return missing;
+		}
 
-        public boolean hasRemaining() {
-            return getRemaining() > 0;
-        }
+		public int getRemaining() {
+			return produced + missing - consumed;
+		}
 
-        public void produce() {
-            ++produced;
-        }
+		public boolean hasRemaining() {
+			return getRemaining() > 0;
+		}
 
-        public void consume() {
-            if (!hasRemaining()) {
-                ++missing;
-            }
-            ++consumed;
-        }
+		public void produce() {
+			++produced;
+		}
 
-        @Override
-        public String toString() {
-            StringWriter writer = new StringWriter();
-            JsonFactory factory = new JsonFactory();
-            JsonGenerator generator;
-            try {
-                generator = factory.createGenerator(writer);
-                generator.writeStartObject();
-                generator.writeFieldName("link");
-                generator.writeRawValue(getLink().toString());
-                generator.writeNumberField("produced", produced);
-                generator.writeNumberField("consumed", consumed);
-                generator.writeNumberField("missing", missing);
-                generator.writeEndObject();
-                generator.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+		public void consume() {
+			if (!hasRemaining()) {
+				++missing;
+			}
+			++consumed;
+		}
 
-            return writer.toString();
-        }
+		@Override
+		public String toString() {
+			StringWriter writer = new StringWriter();
+			JsonFactory factory = new JsonFactory();
+			try (JsonGenerator generator = factory.createGenerator(writer)) {
+				generator.writeStartObject();
+				generator.writeFieldName("link");
+				generator.writeRawValue(getLink().toString());
+				generator.writeNumberField("produced", produced);
+				generator.writeNumberField("consumed", consumed);
+				generator.writeNumberField("missing", missing);
+				generator.writeEndObject();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
-        private int produced;
-        private int consumed;
-        private int missing;
-    }
+			return writer.toString();
+		}
 
-    @JsonCreator
-    public Link(
-            @JsonProperty("source") Node source,
-            @JsonProperty("target") Node target) {
-        this.source = source;
-        this.target = target;
-    }
+		private int produced;
+		private int consumed;
+		private int missing;
+	}
 
-    public State newState() {
-        return new State();
-    }
+	@JsonCreator
+	public Link(
+			@JsonProperty("source") Node source,
+			@JsonProperty("target") Node target) {
+		this.source = source;
+		this.target = target;
+	}
 
-    public Node getSource() {
-        return source;
-    }
+	public State newState() {
+		return new State();
+	}
 
-    public Node getTarget() {
-        return target;
-    }
+	public Node getSource() {
+		return source;
+	}
 
-    @Override
-    public String toString() {
-        StringWriter writer = new StringWriter();
+	public Node getTarget() {
+		return target;
+	}
+
+	@Override
+	public String toString() {
+		StringWriter writer = new StringWriter();
         JsonFactory factory = new JsonFactory();
-        JsonGenerator generator;
-        try {
-            generator = factory.createGenerator(writer);
+        try (JsonGenerator generator = factory.createGenerator(writer)) {
             generator.writeStartObject();
             generator.writeNumberField("sourceID", source.getID());
             generator.writeNumberField("targetID", target.getID());
             generator.writeEndObject();
-            generator.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

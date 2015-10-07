@@ -7,6 +7,7 @@ public enum ProcessEventTag {
     TIME_ANOMALY("time anomaly"),
     INVARIANT_VIOLATION("invariant violation"),
     RESTART("restart"),
+    COMPLETED("completed"),
     UNFIT("unfit");
 
     @JsonCreator
@@ -16,6 +17,8 @@ public enum ProcessEventTag {
                 return ProcessEventTag.UNFIT;
             case "restart":
                 return ProcessEventTag.RESTART;
+            case "completed":
+                return ProcessEventTag.COMPLETED;
             case "invariant violation":
                 return ProcessEventTag.INVARIANT_VIOLATION;
             case "time anomaly":

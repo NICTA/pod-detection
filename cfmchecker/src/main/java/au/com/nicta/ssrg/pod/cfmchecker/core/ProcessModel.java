@@ -62,6 +62,7 @@ public class ProcessModel extends Node {
                     new ConformanceException(ErrorCode.INVARIANT_VIOLATION);
                 ex.instance(instance);
                 ex.nodeState(this);
+                incrementErrorCount();
                 throw ex;
             }
 
@@ -236,6 +237,7 @@ public class ProcessModel extends Node {
             ConformanceException ex =
                 new ConformanceException(ErrorCode.INVARIANT_VIOLATION);
             ex.nodeState(modelState);
+            modelState.incrementErrorCount();
             throw ex;
         }
         if (modelState.releaseToken()) {
@@ -258,16 +260,17 @@ public class ProcessModel extends Node {
         }
         linkStatesIn.get(0).consume();
         ((ProcessModel.State)nodeState).keepToken();
-        return isSuccess;
-    }
+        if (!isSuccess) {
+            nodeState.incrementErrorCount();
+        }
+		return isSuccess;
+	}
 
     @Override
     public String toString() {
         StringWriter writer = new StringWriter();
         JsonFactory factory = new JsonFactory();
-        JsonGenerator generator;
-        try {
-            generator = factory.createGenerator(writer);
+        try (JsonGenerator generator = factory.createGenerator(writer)) {
             generator.writeStartObject();
             generator.writeFieldName("super");
             generator.writeRawValue(super.toString());
@@ -282,7 +285,6 @@ public class ProcessModel extends Node {
             }
             generator.writeEndArray();
             generator.writeEndObject();
-            generator.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

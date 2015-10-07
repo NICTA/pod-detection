@@ -104,9 +104,7 @@ public class ProcessInstance implements ProcessContext {
     public String toString() {
         StringWriter writer = new StringWriter();
         JsonFactory factory = new JsonFactory();
-        JsonGenerator generator;
-        try {
-            generator = factory.createGenerator(writer);
+        try (JsonGenerator generator = factory.createGenerator(writer)) {
             generator.writeStartObject();
             generator.writeStringField("id", id);
             generator.writeBooleanField("isCompleted", isCompleted);
@@ -126,7 +124,6 @@ public class ProcessInstance implements ProcessContext {
             }
             generator.writeEndArray();
             generator.writeEndObject();
-            generator.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

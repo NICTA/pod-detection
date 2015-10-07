@@ -53,13 +53,19 @@ public abstract class Node {
             lastPullTime = new Date();
         }
 
+        public int errorCount() {
+            return errorCount;
+        }
+
+        public void incrementErrorCount() {
+            ++errorCount;
+        }
+
         @Override
         public String toString() {
             StringWriter writer = new StringWriter();
             JsonFactory factory = new JsonFactory();
-            JsonGenerator generator;
-            try {
-                generator = factory.createGenerator(writer);
+            try (JsonGenerator generator = factory.createGenerator(writer)) {
                 generator.writeStartObject();
                 generator.writeFieldName("node");
                 generator.writeRawValue(getNode().toString());
@@ -74,7 +80,6 @@ public abstract class Node {
                         null :
                         lastPullTime.getTime());
                 generator.writeEndObject();
-                generator.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -83,8 +88,9 @@ public abstract class Node {
         }
 
         private Date firstExecutionTime;
-        private Date lastExecutionTime;
-        private Date lastPullTime;
+		private Date lastExecutionTime;
+		private Date lastPullTime;
+        private int errorCount = 0;
     }
 
     public abstract State newState();
@@ -110,13 +116,10 @@ public abstract class Node {
     public String toString() {
         StringWriter writer = new StringWriter();
         JsonFactory factory = new JsonFactory();
-        JsonGenerator generator;
-        try {
-            generator = factory.createGenerator(writer);
+        try (JsonGenerator generator = factory.createGenerator(writer)) {
             generator.writeStartObject();
             generator.writeNumberField("id", id);
             generator.writeEndObject();
-            generator.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -53,6 +53,8 @@ public class ConformanceChecker {
             if (!checkedProcessInstance.isNodeActive(activity) &&
                     !checkedProcessInstance.execute(activity)) {
                 markProcessEventUnfit(event);
+            } else if (rootModelState.getInstance(processInstanceIDs.get(0)).isCompleted()) {
+                event.addTag(ProcessEventTag.COMPLETED);
             }
         } catch (ConformanceException ex) {
             if (ex.code() == ErrorCode.INVARIANT_VIOLATION) {
@@ -138,10 +140,6 @@ public class ConformanceChecker {
                 return instanceToStart;
             }
 
-            if (checkedProcessInstance.isCompleted() &&
-                    !checkedProcessInstance.isNodeActive(nodeInModelToCheck)) {
-                return null;
-            }
             return checkedProcessInstance;
         }
 
