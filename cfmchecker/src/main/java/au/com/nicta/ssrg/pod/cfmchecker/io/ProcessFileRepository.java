@@ -1,24 +1,13 @@
 package au.com.nicta.ssrg.pod.cfmchecker.io;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.List;
-
+import au.com.nicta.ssrg.pod.cfmchecker.newcore.ConformanceCheckResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import au.com.nicta.ssrg.pod.cfmchecker.core.Activity;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessEventTag;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessInstance;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessLogEvent;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessModel;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 
 @Component
 public class ProcessFileRepository
@@ -31,9 +20,9 @@ public class ProcessFileRepository
         this.processLogEventWriter = new FileWriter(processLogEventFile);
     }
 
-    public void storeLogEvent(ProcessLogEvent event) {
+    public void storeConformanceResult(ConformanceCheckResult result) {
         try {
-            processLogEventWriter.write(convertEventToJson(event));
+            processLogEventWriter.write(jsonifyConformanceResult(result));
             processLogEventWriter.write(System.lineSeparator());
             processLogEventWriter.flush();
         } catch (IOException ex) {

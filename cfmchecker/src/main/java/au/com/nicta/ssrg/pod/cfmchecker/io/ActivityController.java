@@ -1,19 +1,12 @@
 package au.com.nicta.ssrg.pod.cfmchecker.io;
 
-import java.util.Date;
-import java.util.concurrent.BlockingQueue;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import au.com.nicta.ssrg.pod.cfmchecker.core.LogInfoExtractor;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessLogEvent;
+import java.util.Date;
+import java.util.concurrent.BlockingQueue;
 
 @RestController
 @RequestMapping(value="/activity")

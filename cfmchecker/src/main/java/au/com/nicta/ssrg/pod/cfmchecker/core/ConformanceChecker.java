@@ -1,11 +1,10 @@
 package au.com.nicta.ssrg.pod.cfmchecker.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import au.com.nicta.ssrg.pod.cfmchecker.core.ConformanceException.ErrorCode;
 import org.apache.commons.lang3.StringUtils;
 
-import au.com.nicta.ssrg.pod.cfmchecker.core.ConformanceException.ErrorCode;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConformanceChecker {
     public ConformanceChecker(ProcessModel rootModel) {

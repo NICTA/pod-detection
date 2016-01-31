@@ -1,6 +1,6 @@
 package au.com.nicta.ssrg.pod.cfmchecker.io;
 
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessLogEvent;
+import au.com.nicta.ssrg.pod.cfmchecker.newcore.ConformanceCheckResult;
 
 public interface ProcessRepository {
     public enum ProcessActivityInstanceStatus {
@@ -35,5 +35,5 @@ public interface ProcessRepository {
         private int value;
     }
 
-    void storeLogEvent(ProcessLogEvent event);
+    void storeConformanceResult(ConformanceCheckResult event);
 }

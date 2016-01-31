@@ -1,23 +1,16 @@
 package au.com.nicta.ssrg.pod.cfmchecker;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
+import au.com.nicta.ssrg.pod.cfmchecker.io.*;
+import au.com.nicta.ssrg.pod.cfmchecker.newcore.ConformanceChecker;
+import au.com.nicta.ssrg.pod.cfmchecker.newcore.ProcessModel;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import au.com.nicta.ssrg.pod.cfmchecker.core.ConformanceChecker;
-import au.com.nicta.ssrg.pod.cfmchecker.core.LogInfoExtractor;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessLogEvent;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessModel;
-import au.com.nicta.ssrg.pod.cfmchecker.io.ActivityPatternImporter;
-import au.com.nicta.ssrg.pod.cfmchecker.io.ProcessEsRepository;
-import au.com.nicta.ssrg.pod.cfmchecker.io.ProcessModelImporter;
-import au.com.nicta.ssrg.pod.cfmchecker.io.ProcessRepository;
-import au.com.nicta.ssrg.pod.cfmchecker.io.RegexLogInfoExtractor;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 @SpringBootApplication
 public class App {

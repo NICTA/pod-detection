@@ -1,15 +1,11 @@
 package au.com.nicta.ssrg.pod.cfmchecker.core;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.*;
 
 public class ProcessInstance implements ProcessContext {
     public ProcessInstance(

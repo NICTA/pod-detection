@@ -1,5 +1,7 @@
 package au.com.nicta.ssrg.pod.cfmchecker.io;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,10 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-
-import au.com.nicta.ssrg.pod.cfmchecker.core.LogInfoExtractor;
 
 public class RegexLogInfoExtractor
         implements LogInfoExtractor {

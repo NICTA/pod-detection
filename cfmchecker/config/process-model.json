@@ -1,6 +1,7 @@
 {
     "name": "Asgard Rolling Upgrade Process",
     "type": "model",
+    "id": 0,
     "nodes": [
         {
             "name": "Start rolling upgrade task",

@@ -1,32 +1,31 @@
 package au.com.nicta.ssrg.pod.cfmchecker;
 
-import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
-import java.util.List;
-
+import au.com.nicta.ssrg.pod.cfmchecker.io.ProcessLogEvent;
+import au.com.nicta.ssrg.pod.cfmchecker.io.ProcessRepository;
+import au.com.nicta.ssrg.pod.cfmchecker.newcore.ConformanceChecker;
+import au.com.nicta.ssrg.pod.cfmchecker.newcore.ConformanceCheckResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import au.com.nicta.ssrg.pod.cfmchecker.core.ConformanceChecker;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessLogEvent;
-import au.com.nicta.ssrg.pod.cfmchecker.io.ProcessRepository;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 @Component
 public class ConformanceCheckerRunner implements CommandLineRunner {
     @Async
     @SuppressWarnings("unchecked")
     public void run(String... args) throws IOException, InterruptedException {
-        processEventQueue = (BlockingQueue<ProcessLogEvent>)
-            context.getBean("processEventQueue");
+        processEventQueue =
+            (BlockingQueue<ProcessLogEvent>)context.getBean("processEventQueue");
         ProcessLogEvent event;
         while ((event = processEventQueue.take()) != null) {
-            conformanceChecker.checkConformance(event);
-            System.out.printf("Checked process event: %s%n", event.toString());
+            ConformanceCheckResult result = conformanceChecker.checkConformance(event);
             for (ProcessRepository processRepository : processRepositories) {
-                processRepository.storeLogEvent(event);
+                processRepository.storeConformanceResult(result);
             }
         }
     }

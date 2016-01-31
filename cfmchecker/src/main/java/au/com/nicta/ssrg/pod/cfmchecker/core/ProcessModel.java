@@ -1,22 +1,14 @@
 package au.com.nicta.ssrg.pod.cfmchecker.core;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import au.com.nicta.ssrg.pod.cfmchecker.core.ConformanceException.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 
-import au.com.nicta.ssrg.pod.cfmchecker.core.ConformanceException.ErrorCode;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.*;
 
 public class ProcessModel extends Node {
     public static class NumericInvariants {
@@ -263,8 +255,8 @@ public class ProcessModel extends Node {
         if (!isSuccess) {
             nodeState.incrementErrorCount();
         }
-		return isSuccess;
-	}
+        return isSuccess;
+    }
 
     @Override
     public String toString() {

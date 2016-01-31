@@ -1,18 +1,12 @@
 package au.com.nicta.ssrg.pod.cfmchecker.io;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.List;
-
-import au.com.nicta.ssrg.pod.cfmchecker.core.Activity;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessEventTag;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessInstance;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessLogEvent;
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessModel;
-
+import au.com.nicta.ssrg.pod.cfmchecker.newcore.*;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Map;
 
 public abstract class JsonProcessRepository
         implements ProcessRepository {
@@ -21,14 +15,24 @@ public abstract class JsonProcessRepository
         jsonFactory.disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
     }
 
-    protected String convertEventToJson(ProcessLogEvent event)
-            throws IOException {
+    protected String jsonifyConformanceResult(ConformanceCheckResult result) throws IOException {
         StringWriter writer = new StringWriter();
+        ProcessLogEvent event = (ProcessLogEvent)result.getEvent();
+
         try (JsonGenerator generator = jsonFactory.createGenerator(writer)) {
             generator.writeStartObject();
+
+            // TODO: will be removed.
             generator.writeStringField(
                 "processInstanceID",
-                event.getProcessIDs().get(0));
+                event.getProcessInstanceIDs().get(0));
+
+            generator.writeArrayFieldStart("processInstanceIDs");
+            for (String piid : event.getProcessInstanceIDs()) {
+                generator.writeString(piid);
+            }
+            generator.writeEndArray();
+
             generator.writeObjectField(
                 "activityID",
                 event.getActivityID());
@@ -36,78 +40,111 @@ public abstract class JsonProcessRepository
                 "activityStatus",
                 event.hasActivityErrorTags() ?
                     ProcessActivityInstanceStatus.ERROR.value() :
-                    ProcessActivityInstanceStatus.OK.value());
-            generator.writeObjectField(
-                "activityStartTime",
-                event.getActivityStartTime() == null ?
-                    null :
-                    event.getActivityStartTime().getTime());
-            generator.writeObjectField(
-                "activityLastExecutionTime",
-                event.getActivityLastExecutionTime() == null ?
-                    null :
-                    event.getActivityLastExecutionTime().getTime());
+                    ProcessActivityInstanceStatus.OK.value()
+            );
+
+            // TODO: will be removed.
+            generator.writeObjectField("activityStartTime", null);
+            generator.writeObjectField("activityLastExecutionTime", null);
+
             generator.writeStringField("log", event.getLog());
             generator.writeObjectField(
                 "logTime",
                 event.getTime() == null ?
                     null :
-                    event.getTime().getTime());
+                    event.getTime().getTime()
+            );
+
             generator.writeArrayFieldStart("tags");
             for (ProcessEventTag tag : event.getTags()) {
                 generator.writeString(tag.value());
             }
             generator.writeEndArray();
-            writeActivityStatesSnapshot(event, generator);
+
+            // TODO: will be removed.
+            writeActivityStatesSnapshot(result, generator);
+
+            generator.writeArrayFieldStart("modelIDs");
+            for (ProcessModel model : result.getModels()) {
+                generator.writeNumber(model.getID());
+            }
+            generator.writeEndArray();
+
+            generator.writeArrayFieldStart("processInstanceStates");
+            for (ProcessContextSnapshot pcSnapshot :
+                 result.getContextSnapshots()) {
+
+                generator.writeStartArray(pcSnapshot.getNodeStateMap().size());
+                for (NodeState nodeState : pcSnapshot.getNodeStateMap().values()) {
+                    if (nodeState instanceof ActivityState) {
+                        writeActivityState(generator, event, (ActivityState)nodeState);
+                    }
+                }
+                generator.writeEndArray();
+            }
+            generator.writeEndArray();
+
             generator.writeEndObject();
             generator.flush();
             return writer.toString();
         }
     }
 
-    private void writeActivityStatesSnapshot(
-            ProcessLogEvent event,
-            JsonGenerator generator)
-            throws IOException {
-        ProcessModel.State modelState = event.getModelState();
-        ProcessInstance instance =
-            modelState.getInstance(event.getProcessIDs().get(0));
-
-        if (instance == null)  {
+    private void writeActivityStatesSnapshot(ConformanceCheckResult result,
+                                             JsonGenerator generator) throws IOException {
+        if (result.getContextSnapshots().size() == 0) {
             return;
         }
 
-        ProcessModel model = (ProcessModel)modelState.getNode();
-        List<Activity> activities = model.getActivities();
+        ProcessLogEvent event = (ProcessLogEvent)result.getEvent();
+        Map<Node, NodeState> stateMap = result.getContextSnapshots()
+                                              .get(0)
+                                              .getNodeStateMap();
+
         generator.writeArrayFieldStart("activityStatesSnapshot");
-        for (Activity activity : activities) {
-            generator.writeStartObject();
-            generator.writeNumberField("id", activity.getID());
-            generator.writeFieldName("state");
-            if (instance.getNodeState(activity).errorCount() > 0) {
-                generator.writeNumber(
-                    ProcessModelActivityState.ERROR.value());
-            } else if (new Integer(activity.getID()).equals(event.getActivityID())) {
-                if (event.containsTag(ProcessEventTag.UNFIT) &&
-                        !event.containsTag(ProcessEventTag.TIME_ANOMALY)) {
-                    generator.writeNumber(
-                        ProcessModelActivityState.ERROR.value());
-                } else {
-                    generator.writeNumber(
-                        ProcessModelActivityState.ACTIVE.value());
-                }
-            } else {
-                if (instance.getNodeState(activity).getLastExecutionTime() == null) {
-                    generator.writeNumber(
-                        ProcessModelActivityState.INACTIVE.value());
-                } else {
-                    generator.writeNumber(
-                        ProcessModelActivityState.COMPLETED.value());
-                }
+        for (NodeState nodeState : stateMap.values()) {
+            if (nodeState instanceof ActivityState) {
+                writeActivityState(generator, event, (ActivityState)nodeState);
             }
-            generator.writeEndObject();
         }
         generator.writeEndArray();
+    }
+
+    private void writeActivityState(JsonGenerator generator,
+                                    ProcessLogEvent event,
+                                    ActivityState activityState)
+                                    throws IOException {
+        generator.writeStartObject();
+
+        int activityID = activityState.getNode().getID();
+        generator.writeNumberField("id", activityID);
+
+        generator.writeFieldName("state");
+        if (activityState.getErrorCount() > 0) {
+            generator.writeNumber(
+                ProcessModelActivityState.ERROR.value());
+
+        } else if (event.getActivityID().equals(activityID)) {
+            if (event.hasTag(ProcessEventTag.UNFIT) &&
+                    !event.hasTag(ProcessEventTag.TIME_ANOMALY)) {
+                generator.writeNumber(
+                    ProcessModelActivityState.ERROR.value());
+            } else {
+                generator.writeNumber(
+                    ProcessModelActivityState.ACTIVE.value());
+            }
+
+        } else {
+            if (activityState.getLastExecTime() == 0) {
+                generator.writeNumber(
+                    ProcessModelActivityState.INACTIVE.value());
+            } else {
+                generator.writeNumber(
+                    ProcessModelActivityState.COMPLETED.value());
+            }
+        }
+
+        generator.writeEndObject();
     }
 
     private JsonFactory jsonFactory;

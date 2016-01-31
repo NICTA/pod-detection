@@ -1,9 +1,9 @@
 package au.com.nicta.ssrg.pod.cfmchecker.io;
 
-import java.util.regex.Pattern;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.regex.Pattern;
 
 public class ActivityPattern {
     @JsonCreator

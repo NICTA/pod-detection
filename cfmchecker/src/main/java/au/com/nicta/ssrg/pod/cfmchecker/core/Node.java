@@ -1,10 +1,5 @@
 package au.com.nicta.ssrg.pod.cfmchecker.core;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Date;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -15,6 +10,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Date;
+import java.util.List;
 
 @JsonTypeInfo(use=Id.NAME, include=As.PROPERTY, property="type")
 @JsonSubTypes({
@@ -88,8 +88,8 @@ public abstract class Node {
         }
 
         private Date firstExecutionTime;
-		private Date lastExecutionTime;
-		private Date lastPullTime;
+        private Date lastExecutionTime;
+        private Date lastPullTime;
         private int errorCount = 0;
     }
 

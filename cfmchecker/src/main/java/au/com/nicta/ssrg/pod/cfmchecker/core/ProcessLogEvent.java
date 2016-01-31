@@ -1,15 +1,11 @@
 package au.com.nicta.ssrg.pod.cfmchecker.core;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Collection;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.*;
 
 public class ProcessLogEvent {
     public ProcessLogEvent(

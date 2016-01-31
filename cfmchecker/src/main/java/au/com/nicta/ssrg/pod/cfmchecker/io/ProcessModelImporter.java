@@ -1,11 +1,10 @@
 package au.com.nicta.ssrg.pod.cfmchecker.io;
 
+import au.com.nicta.ssrg.pod.cfmchecker.newcore.ProcessModel;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
 import java.io.IOException;
-
-import au.com.nicta.ssrg.pod.cfmchecker.core.ProcessModel;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProcessModelImporter {
     public ProcessModelImporter(File sourceFile) {
